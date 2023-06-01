@@ -1,4 +1,4 @@
-# **Lezione su SQL del 30/05/2023**
+# **Lezione su SQL del 30/05/2023 e 01/06/2023**
 
 [sito web] : (https://www.programiz.com/sql/online-compiler/)
 
@@ -195,3 +195,223 @@ SET first_name = first_name || ' Giovanni'
 WHERE customer_id = 6  
 *Posso concatenare string con (||) ed aggiungere un secondo nome alla cella specificata*  
 
+SELECT *  
+FROM customers  
+ORDER BY age ASC  
+*Posso ordinare la tabella da maniera ascendente*   
+
+SELECT *  
+FROM customers  
+ORDER BY age DESC  
+*Posso ordinare la tabella da maniera discendente*  
+
+SELECT *  
+FROM customers  
+ORDER BY last_name ASC, first_name  
+*Ordino in sequenza, prima per cognome poi per nome*  
+
+SELECT first_name, last_name  
+FROM customers  
+ORDER BY age  
+*Ordina i clienti per età mostrando nome e cognome però senza displayare la età*  
+
+SELECT first_name, last_name, age  
+FROM customers  
+ORDER BY age  
+*Ordina i clienti per età mostrando nome, cognome ed età*
+
+SELECT customer_id, amount  
+FROM orders  
+ORDER BY amount DESC  
+*Ordino le ordini fatte dai clienti in ordine discendente mostrando l'id del cliente e soldi spessi*  
+
+SELECT customer_id, amount  
+FROM orders  
+ORDER BY amount DESC  
+LIMIT 3  
+*Individuo i 3 clienti che hanno spesso di più, serve per mostrare i top 3 clienti*  
+
+SELECT COUNT (*)  
+FROM customers  
+*Funzione di aggregazione, serve per contare tutti i clienti che ho nel database*  
+
+SELECT COUNT (*)  
+FROM customers  
+WHERE country = 'USA'  
+*Stampa la quantità di clienti che sono da USA*  
+
+SELECT DISTINCT country  
+FROM customers  
+*Query per vedere tutti i paesi senza duplicati grazie al distinct*  
+
+SELECT COUNT (DISTINCT country)  
+FROM customers  
+*Query per vedere il conteggio totale di paesi dei clienti senza duplicati*  
+
+SELECT MAX (age)  
+FROM customers    
+*Seleziona il valore massimo di una colonna, in questo caso la età*  
+
+SELECT first_name, MAX (age)  
+FROM customers  
+*Seleziona e mostra il cliente di maggiore età*  
+
+SELECT AVG (amount)  
+FROM orders  
+*Calcola la media degli ordini*  
+
+SELECT AVG (amount)  
+FROM orders  
+WHERE amount <= 300  
+*Calcola la media degli ordini dove il risultato sia minore uguale a 300*  
+
+SELECT *  
+FROM orders  
+ORDER BY amount DESC  
+LIMIT 3  
+*Seleziona i top 3 ordini che hanno spesso di più in ordine discendente*  
+
+SELECT AVG (amount)  
+FROM (  
+   $~~~$ SELECT amount  
+   $~~~$ FROM orders  
+   $~~~$ ORDER BY amount DESC  
+   $~~~$ LIMIT 3  
+  );
+  
+  
+SELECT amount  
+FROM orders  
+ORDER BY amount DESC  
+LIMIT 3  
+*Mostra la media e i top 3 clienti che hanno spesso di più*  
+
+SELECT SUM (amount)  
+FROM orders  
+*Funzione di aggregazione per sommare le spesse di tutti gli ordini*  
+
+SELECT SUM (amount)  
+FROM orders  
+WHERE customer_id = 2  
+*Somma totale delle spesse fatte dal cliente con id 2*  
+
+SELECT customer_id, SUM (amount)  
+FROM orders  
+GROUP BY customer_id  
+*Mostra la somma dei clienti ordinandole per i suoi id*  
+
+SELECT customer_id, SUM (amount) as total  
+FROM orders  
+GROUP BY customer_id  
+ORDER BY total DESC  
+LIMIT 3  
+*as total è un alias che mi crea una colonna con il risultato delle somme totali e posso referenziarlo dopo*  
+
+SELECT customer_id, SUM (amount) as total  
+FROM orders  
+GROUP BY customer_id  
+HAVING total >= 700  
+ORDER BY total DESC  
+LIMIT 3  
+*HAVING è un'alternativa al WHERE*    
+
+Mostrare il nome e cognome di tutti i clienti la cui media di spesa è superiore alla media di spessa complessiva di tutti i clienti (ESERCIZIO)  
+
+SELECT *  
+FROM orders  
+JOIN customers  
+WHERE orders.customer_id = customers.customer_id  
+*Esempio di Equi Join*  
+
+SELECT *  
+FROM orders o   
+JOIN customers c  
+WHERE o.customer_id = c.customer_id  
+*o e c sono alias, posso anche scriverli senza il 'as'*  
+
+SELECT c.customer_id, c.first_name, c.last_name, o.item, o.amount  
+FROM orders o  
+JOIN customers c  
+WHERE o.customer_id = c.customer_id  
+*Posso usare gli alias nel SELECT per essere più specifico*  
+
+SELECT c.customer_id, c.first_name, c.last_name, o.item, o.amount  
+FROM orders o  
+JOIN customers c  
+ON o.customer_id = c.customer_id  
+*Alternativa a WHERE che è più veloce da esseguire*  
+
+## Esempi DDL
+
+ALTER TABLE shippings  
+ADD COLUMN order_id integer  
+*aggiungo una nuova colonna 'order_id' nella mia tabella shippings*  
+
+UPDATE shippings  
+SET order_id = customer  
+*aggiorno la tabella shippings copiando i valori di order_id e incollandoli a customer*  
+
+ALTER TABLE shippings  
+DROP COLUMN customer  
+*Cancello la colonna customer nella tabella shippings*  
+
+SELECT *  
+FROM shippings as s  
+  
+JOIN orders as o  
+ON s.order_id = o.order_id   
+  
+JOIN customers as c  
+ON o.customer_id = c.customer_id  
+*Concatenazione di JOIN*  
+
+SELECT c.customer_id, c.first_name, c.last_name, c.country, o.  item, o.amount, s.status  
+FROM shippings as s  
+
+JOIN orders as o  
+ON s.order_id = o.order_id     
+
+JOIN customers as c  
+ON o.customer_id = c.customer_id  
+
+WHERE c.country = 'USA'  
+AND s.status = 'Pending'  
+*Si deve tenere in conto l'ordine delle query*
+
+LEFT JOIN shippings as s  
+ON s.order_id = o.order_id    
+*esempio LEFT JOIN*  
+
+ORDER BY s.status NULLS FIRST;  
+*Ordina i risultato mettendo come primo tutti i null*  
+
+CREATE TABLE products (  
+   $~~~$ product_id integer not null,  
+   $~~~$ category varchar(250),  
+   $~~~$ model integer not null,  
+   $~~~$ name varchar(250) not null,  
+   $~~~$ unit_price float not null,  
+   $~~~$ is_available boolean not null,  
+    
+   $~~~$ primary key(product_id),  
+   $~~~$ unique(name, model)  
+ );  
+ *Sintassi per creare tabelle nuove con tutti i campi, dati, tipi, chiavi primarie e secondarie*  
+
+INSERT INTO products  
+values(1, null, 'Ihone', 10, 800, true)  
+*Inserisco i dati nella tabella appena creata*  
+
+SELECT null, 'Computers', item, 1, amount, true  
+FROM orders;  
+*Altra maniera di aggiungere dati al mio elenco di prodotti*
+
+INSERT INTO products(product_id, category, name, model, unit_price, is_available)  
+SELECT DISTINCT null, 'Computers', item, 1, amount, true  
+FROM orders;  
+*Serve per importare dati di una tabella all'altra*  
+
+ALTER TABLE orders  
+ADD COLUMN product_id integer references products(product_id)  
+*References serve per aggiungere la colonna di un'altra tabella in quella che ho bisogno specificandola*  
+ 
